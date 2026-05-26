@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>VotApp - Congreso</title>
+
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🏛️ SISTEMA DE VOTACIÓN PARLAMENTARIA</h1>
+    <h2 id="status">● SIN SESIÓN</h2>
+</header>
+
+<section class="main">
+
+    <!-- 🟢 YES -->
+    <div class="vote-box yes">
+        <h3>AFIRMATIVO</h3>
+        <p id="yes">0</p>
+    </div>
+
+    <!-- 🔴 NO -->
+    <div class="vote-box no">
+        <h3>NEGATIVO</h3>
+        <p id="no">0</p>
+    </div>
+
+    <!-- 🟡 ABSTAIN -->
+    <div class="vote-box abstain">
+        <h3>ABSTENCIÓN</h3>
+        <p id="abstain">0</p>
+    </div>
+
+</section>
+
+<!-- 📊 BARRA -->
+<section class="bar-container">
+    <div id="bar-yes"></div>
+    <div id="bar-no"></div>
+    <div id="bar-abstain"></div>
+</section>
+
+<!-- 📡 INFO -->
+<section class="info">
+    <p>👥 Conectados: <span id="count">0</span></p>
+    <p>📊 Quórum: <span id="quorum">0%</span></p>
+    <h2>🏛️ Hemiciclo</h2>
+
+    <div id="hemicycle"></div>
+
+    <h2>📊 Mapa político</h2>
+    <div id="political-map"></div>
+
+</section>
+
+<script src="../assets/js/ws.js"></script>
+<script src="../assets/js/dashboard.js"></script>
+
+</body>
+</html>

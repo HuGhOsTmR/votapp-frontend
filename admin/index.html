@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<h1>🏛️ Panel Administrativo</h1>
+
+<!-- ========================= -->
+<!-- CREAR ASAMBLEA -->
+<!-- ========================= -->
+<h2>Crear Asamblea</h2>
+
+<input id="assemblyName" placeholder="Nombre Asamblea">
+<select id="assemblyType">
+    <option value="diputados">Diputados</option>
+    <option value="senadores">Senadores</option>
+    <option value="municipal">Concejo Municipal</option>
+</select>
+
+<button onclick="createAssembly()">Crear</button>
+
+<hr>
+
+<h3>Asambleas</h3>
+<ul id="assemblies"></ul>
+
+<hr>
+
+<!-- ========================= -->
+<!-- CREAR MOCIÓN -->
+<!-- ========================= -->
+<h2>Crear Moción</h2>
+
+<input id="motionTitle" placeholder="Título">
+<button onclick="createMotion()">Crear</button>
+
+<h3>Mociones</h3>
+<ul id="motions"></ul>
+
+<hr>
+
+<!-- ========================= -->
+<!-- CONTROL -->
+<!-- ========================= -->
+<h2>Control de Votación</h2>
+
+<select id="motionSelect"></select>
+
+<button onclick="startMotion()">🟢 Iniciar</button>
+<button onclick="closeMotion()">🔴 Cerrar</button>
+
+<p id="status">Estado: -</p>
+
+<hr>
+<h2>🏷️ Crear Grupo / Bloque</h2>
+
+<input id="group-name" placeholder="Nombre (MAS, Zona Norte)">
+<select id="group-type">
+    <option value="partido">Partido</option>
+    <option value="barrio">Barrio</option>
+    <option value="bloque">Bloque</option>
+    <option value="comision">Comisión</option>
+</select>
+
+<input id="group-color" type="color">
+
+<button onclick="createGroup()">Crear Grupo</button>
+
+<ul id="groups"></ul>
+<!-- ========================= -->
+<!-- VOTAR -->
+<!-- ========================= -->
+<h2>Votar (modo test)</h2>
+
+<button onclick="vote('YES')">YES</button>
+<button onclick="vote('NO')">NO</button>
+<button onclick="vote('ABSTAIN')">ABSTAIN</button>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/ws.js"></script>
+<script src="../assets/js/admin.js"></script>
+
+</body>
+</html>

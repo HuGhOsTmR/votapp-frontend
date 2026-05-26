@@ -1,0 +1,134 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b132b;
+    color: white;
+    text-align: center;
+}
+
+/* HEADER */
+header {
+    background: #1c2541;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+#status {
+    color: #00ffcc;
+}
+
+/* MAIN */
+.main {
+    display: flex;
+    justify-content: space-around;
+    margin: 40px 0;
+}
+
+.vote-box {
+    width: 25%;
+    padding: 30px;
+    border-radius: 10px;
+    font-size: 30px;
+}
+
+.vote-box p {
+    font-size: 60px;
+    margin: 10px 0;
+}
+
+.yes {
+    background: #2ecc71;
+}
+
+.no {
+    background: #e74c3c;
+}
+
+.abstain {
+    background: #f1c40f;
+    color: black;
+}
+
+/* BARRA */
+.bar-container {
+    display: flex;
+    height: 40px;
+    margin: 20px;
+}
+
+#bar-yes {
+    background: #2ecc71;
+}
+
+#bar-no {
+    background: #e74c3c;
+}
+
+#bar-abstain {
+    background: #f1c40f;
+}
+
+/* INFO */
+.info {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+#hemicycle {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 600px;
+    margin: auto;
+}
+
+.seat {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: 0.3s;
+}
+
+/* votos */
+.seat.yes { background: #00c853; }
+.seat.no { background: #d50000; }
+.seat.abstain { background: #ffd600; }
+
+/* partidos */
+.party-MAS { border: 2px solid blue; }
+.party-CC { border: 2px solid orange; }
+.party-CREEMOS { border: 2px solid red; }
+
+/* barras */
+.results-bar {
+    display: flex;
+    height: 20px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#bar-yes { background: green; width: 0%; }
+#bar-no { background: red; width: 0%; }
+#bar-abstain { background: yellow; width: 0%; }
+
+/* mapa político */
+#political-map {
+    display: flex;
+    gap: 10px;
+}
+
+.party-box {
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+}
+
+.party-box.MAS { background: blue; }
+.party-box.CC { background: orange; }
+.party-box.CREEMOS { background: red; }
