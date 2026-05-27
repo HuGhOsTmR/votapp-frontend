@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
@@ -14,6 +15,7 @@
 <h2>Crear Asamblea</h2>
 
 <input id="assemblyName" placeholder="Nombre Asamblea">
+
 <select id="assemblyType">
     <option value="diputados">Diputados</option>
     <option value="senadores">Senadores</option>
@@ -34,7 +36,7 @@
 <!-- ========================= -->
 <h2>Crear Moción</h2>
 
-<input id="motionTitle" placeholder="Título">
+<input id="motionTitle" placeholder="Título de la moción">
 <button onclick="createMotion()">Crear</button>
 
 <h3>Mociones</h3>
@@ -43,21 +45,35 @@
 <hr>
 
 <!-- ========================= -->
-<!-- CONTROL -->
+<!-- CONTROL VOTACIÓN -->
 <!-- ========================= -->
 <h2>Control de Votación</h2>
 
-<select id="motionSelect"></select>
+<p><strong>Estado:</strong> <span id="status">-</span></p>
 
-<button onclick="startMotion()">🟢 Iniciar</button>
-<button onclick="closeMotion()">🔴 Cerrar</button>
-
-<p id="status">Estado: -</p>
+<button onclick="startMotion()">🟢 Iniciar Votación</button>
+<button onclick="closeMotion()">🔴 Cerrar Votación</button>
 
 <hr>
+
+<!-- ========================= -->
+<!-- RESULTADOS -->
+<!-- ========================= -->
+<h2>📊 Resultados</h2>
+
+<p>YES: <span id="yes">0</span></p>
+<p>NO: <span id="no">0</span></p>
+<p>ABSTAIN: <span id="abstain">0</span></p>
+
+<hr>
+
+<!-- ========================= -->
+<!-- GRUPOS / BLOQUES -->
+<!-- ========================= -->
 <h2>🏷️ Crear Grupo / Bloque</h2>
 
-<input id="group-name" placeholder="Nombre (MAS, Zona Norte)">
+<input id="group-name" placeholder="Nombre (MAS, Zona Norte, Bloque A)">
+    
 <select id="group-type">
     <option value="partido">Partido</option>
     <option value="barrio">Barrio</option>
@@ -70,16 +86,21 @@
 <button onclick="createGroup()">Crear Grupo</button>
 
 <ul id="groups"></ul>
+
+<hr>
+
 <!-- ========================= -->
-<!-- VOTAR -->
+<!-- VOTAR (TEST ADMIN) -->
 <!-- ========================= -->
-<h2>Votar (modo test)</h2>
+<h2>🗳️ Votar (modo prueba)</h2>
 
 <button onclick="vote('YES')">YES</button>
 <button onclick="vote('NO')">NO</button>
 <button onclick="vote('ABSTAIN')">ABSTAIN</button>
 
-
+<!-- ========================= -->
+<!-- SCRIPTS -->
+<!-- ========================= -->
 <script type="module" src="../assets/js/api.js"></script>
 <script type="module" src="../assets/js/ws.js"></script>
 <script type="module" src="../assets/js/admin.js"></script>
