@@ -49,6 +49,9 @@
 <!-- ========================= -->
 <h2>Control de Votación</h2>
 
+<label>Moción activa:</label>
+<select id="motionSelect"></select>
+
 <p><strong>Estado:</strong> <span id="status">-</span></p>
 
 <button onclick="startMotion()">🟢 Iniciar Votación</button>
@@ -61,9 +64,11 @@
 <!-- ========================= -->
 <h2>📊 Resultados</h2>
 
-<p>YES: <span id="yes">0</span></p>
-<p>NO: <span id="no">0</span></p>
-<p>ABSTAIN: <span id="abstain">0</span></p>
+<div style="display:flex; gap:20px;">
+    <div>YES: <span id="yes">0</span></div>
+    <div>NO: <span id="no">0</span></div>
+    <div>ABSTAIN: <span id="abstain">0</span></div>
+</div>
 
 <hr>
 
@@ -101,8 +106,8 @@
 <!-- ========================= -->
 <!-- SCRIPTS -->
 <!-- ========================= -->
-<script type="module" src="../assets/js/api.js"></script>
-<script type="module" src="../assets/js/ws.js"></script>
+
+<!-- SOLO admin.js importa todo -->
 <script type="module" src="../assets/js/admin.js"></script>
 
 </body>
