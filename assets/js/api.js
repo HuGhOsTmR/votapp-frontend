@@ -1,39 +1,20 @@
-const API = "https://votapp-backend-g856.onrender.com/";
+import { API_URL } from "./config.js";
 
-function authHeaders() {
-    return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("token")
-    };
-}
+export async function apiFetch(endpoint, options = {}) {
 
-// =========================
-// CREAR ASAMBLEA
-// =========================
-async function apiCreateAssembly(name) {
+    const token = localStorage.getItem("token");
 
-    const res = await fetch(`${API}/assemblies`, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({ name })
+    const res = await fetch(`${API_URL}${endpoint}`, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        ...options
     });
 
-    return res.json();
-}
-
-// =========================
-// CREAR MOCIÓN
-// =========================
-async function apiCreateMotion(title, assemblyId) {
-
-    const res = await fetch(`${API}/motions`, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({
-            title,
-            assembly_id: assemblyId
-        })
-    });
+    if (!res.ok) {
+        console.error("API ERROR:", res.status);
+    }
 
     return res.json();
 }
