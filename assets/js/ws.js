@@ -1,50 +1,43 @@
-// ==========================
-// 🌐 CONFIGURACIÓN
-// ==========================
+import { WS_URL } from "./config.js";
 
-// LOCAL
-//const WS_URL = "ws://127.0.0.1:8000/ws";
+let socket = null;
 
-// PRODUCCIÓN (cuando uses Render)
-const WS_URL = "wss://votapp-backend-g856.onrender.com/ws";
+export function connectWS(assemblyId, handler) {
 
-// ==========================
-// 🔌 CONEXIÓN WS
-// ==========================
-function connectWS(token, assemblyId, handler) {
+    const token = localStorage.getItem("token");
 
-    if (!token) {
-        console.error("❌ No hay token");
-        return;
+    if (socket) {
+        socket.close();
     }
 
-    if (!assemblyId) {
-        console.error("❌ No hay assembly_id");
-        return;
-    }
+    socket = new WebSocket(
+        `${WS_URL}/ws/${assemblyId}?token=${token}`
+    );
 
-    const url = `${WS_URL}/${assemblyId}?token=${token}`;
-
-    console.log("🔌 Conectando WS:", url);
-
-    const ws = new WebSocket(url);
-
-    ws.onopen = () => {
+    socket.onopen = () => {
         console.log("🟢 WS conectado");
     };
 
-    ws.onmessage = (event) => {
+    socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         handler(data);
     };
 
-    ws.onerror = (err) => {
-        console.error("❌ WS error:", err);
-    };
-
-    ws.onclose = () => {
+    socket.onclose = () => {
         console.log("🔴 WS cerrado");
     };
 
-    return ws;
+    socket.onerror = (e) => {
+        console.error("❌ WS error", e);
+    };
+
+    return socket;
+}
+
+export function sendWS(data) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(data));
+    } else {
+        console.warn("WS no conectado");
+    }
 }
