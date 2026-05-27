@@ -1,39 +1,40 @@
-const token = localStorage.getItem("token");
+import { apiFetch } from "./api.js";
+import { connectWS, sendWS } from "./ws.js";
 
 let selectedAssembly = null;
 let selectedMotion = null;
-let ws = null;
 
 // ==========================
-// 🏛️ CREAR ASAMBLEA
+// INIT
+// ==========================
+window.addEventListener("DOMContentLoaded", () => {
+    loadAssemblies();
+
+    document.getElementById("motionSelect")
+        .addEventListener("change", (e) => {
+            selectedMotion = e.target.value;
+        });
+});
+
+// ==========================
+// 🏛️ ASAMBLEA
 // ==========================
 async function createAssembly() {
 
     const name = document.getElementById("assemblyName").value;
     const type = document.getElementById("assemblyType").value;
 
-    await fetch("http://127.0.0.1:8000/assemblies", {
+    await apiFetch("/assemblies", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ name, type })
     });
 
     loadAssemblies();
 }
 
-// ==========================
-// 📜 LISTAR ASAMBLEAS
-// ==========================
 async function loadAssemblies() {
 
-    const res = await fetch("http://127.0.0.1:8000/assemblies", {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
-
-    const data = await res.json();
+    const data = await apiFetch("/assemblies");
 
     const list = document.getElementById("assemblies");
 
@@ -44,33 +45,24 @@ async function loadAssemblies() {
     `).join("");
 }
 
-// ==========================
-// 🧠 SELECCIONAR ASAMBLEA
-// ==========================
 function selectAssembly(id) {
 
     selectedAssembly = id;
     localStorage.setItem("assembly_id", id);
 
-    console.log("🏛️ Asamblea seleccionada:", id);
-
-    connectWS();
+    connectWS(id, handleWS);
     loadMotions();
 }
 
 // ==========================
-// 🧾 CREAR MOCIÓN
+// 🧾 MOCIONES
 // ==========================
 async function createMotion() {
 
     const title = document.getElementById("motionTitle").value;
 
-    await fetch("http://127.0.0.1:8000/motions", {
+    await apiFetch("/motions", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({
             assembly_id: selectedAssembly,
             title
@@ -80,19 +72,9 @@ async function createMotion() {
     loadMotions();
 }
 
-// ==========================
-// 📜 LISTAR MOCIONES
-// ==========================
 async function loadMotions() {
 
-    const res = await fetch(
-        `http://127.0.0.1:8000/motions/${selectedAssembly}`,
-        {
-            headers: { "Authorization": `Bearer ${token}` }
-        }
-    );
-
-    const data = await res.json();
+    const data = await apiFetch(`/motions/${selectedAssembly}`);
 
     const list = document.getElementById("motions");
     const select = document.getElementById("motionSelect");
@@ -115,131 +97,84 @@ async function loadMotions() {
         `;
     });
 }
-// ==========================
-// 🎯 SELECCIONAR MOCIÓN
-// ==========================
+
 function selectMotion(id) {
-
     selectedMotion = id;
-    localStorage.setItem("motion_id", id);
 }
 
 // ==========================
-// 🔌 WS
-// ==========================
-function connectWS() {
-
-    if (ws) {
-        ws.close();
-    }
-
-    ws = new WebSocket(
-        `ws://127.0.0.1:8000/ws/${selectedAssembly}?token=${token}`
-    );
-
-    ws.onopen = () => {
-        console.log("🟢 WS conectado");
-    };
-
-    ws.onmessage = (event) => {
-
-        const data = JSON.parse(event.data);
-        console.log("WS:", data);
-
-        if (data.type === "vote_update") {
-            updateResults(data.results);
-        }
-
-        if (data.type === "motion_started") {
-            setStatus("🟢 VOTACIÓN EN CURSO");
-        }
-
-        if (data.type === "motion_closed") {
-            setStatus("🔴 VOTACIÓN CERRADA");
-            updateResults(data.results);
-        }
-    };
-
-    ws.onclose = () => {
-        console.log("🔴 WS desconectado");
-    };
-    ws.onerror = (e) => {
-    console.error("❌ WS error", e);
-    };
-}
-
-// ==========================
-// 🟢 INICIAR VOTACIÓN
+// 🟢🔴 CONTROL
 // ==========================
 function startMotion() {
 
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert("WS no conectado");
-        return;
-    }
-
-    if (!selectedMotion) {
-        alert("Selecciona una moción");
-        return;
-    }
-
-    ws.send(JSON.stringify({
+    sendWS({
         type: "start_motion",
         motion_id: selectedMotion
-    }));
+    });
 }
 
-// ==========================
-// 🔴 CERRAR VOTACIÓN
-// ==========================
 function closeMotion() {
 
-    ws.send(JSON.stringify({
+    sendWS({
         type: "close_motion",
         motion_id: selectedMotion
-    }));
+    });
 }
 
 // ==========================
-// 🗳️ VOTAR (ADMIN TAMBIÉN)
+// 🗳️ VOTO
 // ==========================
 function vote(value) {
 
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert("WS no conectado");
-        return;
-    }
-
-    if (!selectedMotion) {
-        alert("Selecciona una moción");
-        return;
-    }
-
-    ws.send(JSON.stringify({
+    sendWS({
         type: "vote",
         motion_id: selectedMotion,
         vote: value
-    }));
+    });
 }
 
 // ==========================
-// 📊 RESULTADOS
+// 📡 WS HANDLER
+// ==========================
+function handleWS(data) {
+
+    console.log("WS:", data);
+
+    if (data.type === "motion_started") {
+        setStatus("🟢 EN VOTACIÓN");
+    }
+
+    if (data.type === "motion_closed") {
+        setStatus("🔴 CERRADA");
+        updateResults(data.results);
+    }
+
+    if (data.type === "vote_update") {
+        updateResults(data.results);
+    }
+}
+
 // ==========================
 function updateResults(results) {
+
+    if (!document.getElementById("yes")) return;
 
     document.getElementById("yes").innerText = results.YES || 0;
     document.getElementById("no").innerText = results.NO || 0;
     document.getElementById("abstain").innerText = results.ABSTAIN || 0;
 }
 
-// ==========================
 function setStatus(text) {
     document.getElementById("status").innerText = text;
 }
 
-document.getElementById("motionSelect").addEventListener("change", (e) => {
-    selectedMotion = e.target.value;
-});
-
-// INIT
-loadAssemblies();
+// ==========================
+// 🌐 GLOBAL (IMPORTANTE)
+// ==========================
+window.createAssembly = createAssembly;
+window.createMotion = createMotion;
+window.selectAssembly = selectAssembly;
+window.selectMotion = selectMotion;
+window.startMotion = startMotion;
+window.closeMotion = closeMotion;
+window.vote = vote;
