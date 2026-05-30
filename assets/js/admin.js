@@ -8,7 +8,8 @@ let selectedMotion = null;
 // INIT
 // ==========================
 window.addEventListener("DOMContentLoaded", () => {
-    loadAssemblies();
+
+    console.log("🚀 Admin iniciado");
 
     document.getElementById("motionSelect")
         .addEventListener("change", (e) => {
@@ -17,85 +18,57 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================
-// 🏛️ ASAMBLEA
+// 🏛️ CREAR / ABRIR ASAMBLEA
 // ==========================
 async function createAssembly() {
 
-    const name = document.getElementById("assemblyName").value;
-    const type = document.getElementById("assemblyType").value;
+    try {
 
-    await apiFetch("/assemblies", {
-        method: "POST",
-        body: JSON.stringify({ name, type })
-    });
+        const res = await apiFetch("/assemblies/open", {
+            method: "POST"
+        });
 
-    loadAssemblies();
+        console.log("🟢 Asamblea abierta:", res);
+
+        alert("Asamblea iniciada correctamente");
+
+        // ⚠️ como no hay endpoint de listado,
+        // pedimos ID manual
+        selectAssemblyManual();
+
+    } catch (err) {
+        console.error(err);
+        alert("Error al crear asamblea");
+    }
 }
 
-async function loadAssemblies() {
+// ==========================
+// 🧠 SELECCIÓN MANUAL (CLAVE)
+// ==========================
+function selectAssemblyManual() {
 
-    const data = await apiFetch("/assemblies");
+    const id = prompt("Ingresa el assembly_id:");
 
-    const list = document.getElementById("assemblies");
-
-    list.innerHTML = data.map(a => `
-        <li onclick="selectAssembly('${a.id}')">
-            ${a.name}
-        </li>
-    `).join("");
-}
-
-function selectAssembly(id) {
+    if (!id) return;
 
     selectedAssembly = id;
+
     localStorage.setItem("assembly_id", id);
 
+    console.log("🏛️ Asamblea seleccionada:", id);
+
     connectWS(id, handleWS);
-    loadMotions();
 }
 
 // ==========================
-// 🧾 MOCIONES
+// 🧾 MOCIONES (NO IMPLEMENTADO)
 // ==========================
 async function createMotion() {
-
-    const title = document.getElementById("motionTitle").value;
-
-    await apiFetch("/motions", {
-        method: "POST",
-        body: JSON.stringify({
-            assembly_id: selectedAssembly,
-            title
-        })
-    });
-
-    loadMotions();
+    alert("⚠️ Backend aún no tiene endpoint /motions");
 }
 
 async function loadMotions() {
-
-    const data = await apiFetch(`/motions/${selectedAssembly}`);
-
-    const list = document.getElementById("motions");
-    const select = document.getElementById("motionSelect");
-
-    list.innerHTML = "";
-    select.innerHTML = "";
-
-    data.forEach(m => {
-
-        list.innerHTML += `
-            <li onclick="selectMotion('${m.id}')">
-                ${m.title}
-            </li>
-        `;
-
-        select.innerHTML += `
-            <option value="${m.id}">
-                ${m.title}
-            </option>
-        `;
-    });
+    console.warn("No implementado aún");
 }
 
 function selectMotion(id) {
@@ -107,6 +80,11 @@ function selectMotion(id) {
 // ==========================
 function startMotion() {
 
+    if (!selectedMotion) {
+        alert("Selecciona una moción");
+        return;
+    }
+
     sendWS({
         type: "start_motion",
         motion_id: selectedMotion
@@ -114,6 +92,11 @@ function startMotion() {
 }
 
 function closeMotion() {
+
+    if (!selectedMotion) {
+        alert("Selecciona una moción");
+        return;
+    }
 
     sendWS({
         type: "close_motion",
@@ -125,6 +108,11 @@ function closeMotion() {
 // 🗳️ VOTO
 // ==========================
 function vote(value) {
+
+    if (!selectedMotion) {
+        alert("Selecciona una moción");
+        return;
+    }
 
     sendWS({
         type: "vote",
@@ -138,7 +126,7 @@ function vote(value) {
 // ==========================
 function handleWS(data) {
 
-    console.log("WS:", data);
+    console.log("📡 WS:", data);
 
     if (data.type === "motion_started") {
         setStatus("🟢 EN VOTACIÓN");
@@ -169,12 +157,10 @@ function setStatus(text) {
 }
 
 // ==========================
-// 🌐 GLOBAL (IMPORTANTE)
+// 🌐 GLOBAL
 // ==========================
 window.createAssembly = createAssembly;
-window.createMotion = createMotion;
-window.selectAssembly = selectAssembly;
-window.selectMotion = selectMotion;
+window.selectAssemblyManual = selectAssemblyManual;
 window.startMotion = startMotion;
 window.closeMotion = closeMotion;
 window.vote = vote;
